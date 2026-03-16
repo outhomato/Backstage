@@ -8,7 +8,7 @@ type Props = {
 
 export default function WebScreen({ url }: Props) {
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <WebView
         source={{ uri: url }}
         style={styles.webview}
