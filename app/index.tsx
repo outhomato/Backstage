@@ -1,57 +1,89 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Image, ActivityIndicator, View, Text } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { useMenuConfig, MENU_BASE_URL } from './hooks/useMenuConfig';
 import WebScreen from './screens/WebScreen';
 
 const Tab = createBottomTabNavigator();
 
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-
-const TAB_ICONS: Record<string, IoniconName> = {
-  Spånga: 'leaf-outline',
-  Hem: 'home-outline',
-  Sök: 'search-outline',
-  Profil: 'person-outline',
-};
-
 export default function App() {
+  const { config, loading, error } = useMenuConfig();
+  // resetKeys forces a WebView remount (= reload to original URL) on tab press
+  const [resetKeys, setResetKeys] = useState<Record<string, number>>({});
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (error || !config) {
+    return (
+      <View style={styles.center}>
+        <Text>Kunde inte ladda meny: {error}</Text>
+      </View>
+    );
+  }
+
+  const initialTab = config.tabs.find(t => t.initial)?.label ?? config.tabs[0].label;
+
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="Hem"
+        initialRouteName={initialTab}
         screenOptions={({ route }) => ({
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name={TAB_ICONS[route.name]} size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => {
+            const tab = config.tabs.find(t => t.label === route.name);
+            if (!tab) return null;
+            return (
+              <Image
+                source={{ uri: `${MENU_BASE_URL}icons/${tab.icon}.png` }}
+                style={{ width: size, height: size, tintColor: color }}
+              />
+            );
+          },
           tabBarActiveTintColor: '#000',
-          tabBarInactiveTintColor: '#555',
+          tabBarInactiveTintColor: '#666',
           tabBarStyle: Platform.OS === 'ios' ? styles.tabBarIOS : styles.tabBarAndroid,
           tabBarBackground: Platform.OS === 'ios'
-            ? () => <BlurView intensity={60} tint="systemMaterial" style={StyleSheet.absoluteFill} />
+            ? () => <BlurView intensity={80} tint="systemUltraThinMaterial" style={StyleSheet.absoluteFill} />
             : undefined,
         })}
       >
-        <Tab.Screen name="Spånga">
-          {() => <WebScreen url="https://www.spangascouterna.se" />}
-        </Tab.Screen>
-        <Tab.Screen name="Hem">
-          {() => <WebScreen url="https://www.spangascouterna.se/backstage" />}
-        </Tab.Screen>
-        <Tab.Screen name="Sök">
-          {() => <WebScreen url="https://example.com" />}
-        </Tab.Screen>
-        <Tab.Screen name="Profil">
-          {() => <WebScreen url="https://example.com" />}
-        </Tab.Screen>
+        {config.tabs.map(tab => (
+          <Tab.Screen
+            key={tab.label}
+            name={tab.label}
+            listeners={{
+              tabPress: () => {
+                setResetKeys(prev => ({ ...prev, [tab.label]: (prev[tab.label] ?? 0) + 1 }));
+              },
+            }}
+          >
+            {() => (
+              <WebScreen
+                key={resetKeys[tab.label] ?? 0}
+                url={tab.url}
+              />
+            )}
+          </Tab.Screen>
+        ))}
       </Tab.Navigator>
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   tabBarIOS: {
     position: 'absolute',
     borderTopWidth: 0,

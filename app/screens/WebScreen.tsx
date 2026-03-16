@@ -1,6 +1,5 @@
 import { WebView } from 'react-native-webview';
-import { StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
 
 type Props = {
   url: string;
@@ -8,7 +7,7 @@ type Props = {
 
 export default function WebScreen({ url }: Props) {
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       <WebView
         source={{ uri: url }}
         style={styles.webview}
@@ -16,7 +15,7 @@ export default function WebScreen({ url }: Props) {
         thirdPartyCookiesEnabled={true}
         javaScriptEnabled={true}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
