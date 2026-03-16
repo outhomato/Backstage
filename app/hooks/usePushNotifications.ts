@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
 const REGISTER_URL = 'https://www.spangascouterna.se/backstage/apps/mobile/register/';
 
@@ -12,6 +13,8 @@ export function usePushNotifications() {
 }
 
 async function registerForPushNotifications() {
+  // expo-notifications kräver native build (fungerar ej i Expo Go från SDK 53+)
+  if (Constants.appOwnership === 'expo') return;
   if (!Device.isDevice) return;
 
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
