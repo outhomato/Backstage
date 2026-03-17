@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-const BADGES_BASE_URL = 'https://www.spangascouterna.se/backstage/mobile/badges/';
+const BADGES_URL = 'https://www.spangascouterna.se/backstage/mobile/badges/';
 const POLL_INTERVAL_MS = 60_000;
 
 export interface BadgeConfig {
@@ -10,19 +10,14 @@ export interface BadgeConfig {
 
 export type BadgeMap = Record<string, BadgeConfig>;
 
-export function useBadges(userId: string | null) {
+export function useBadges() {
   const [badges, setBadges] = useState<BadgeMap>({});
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!userId) {
-      setBadges({});
-      return;
-    }
-
     async function fetchBadges() {
       try {
-        const res = await fetch(`${BADGES_BASE_URL}${userId}.json`, {
+        const res = await fetch(BADGES_URL, {
           credentials: 'include',
           cache: 'no-store',
         });
