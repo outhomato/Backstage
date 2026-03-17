@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-const BADGES_BASE_URL = 'https://www.spangascouterna.se/backstage/badges/';
+const BADGES_BASE_URL = 'https://www.spangascouterna.se/backstage/mobile/badges/';
 const POLL_INTERVAL_MS = 60_000;
 
 export interface BadgeConfig {

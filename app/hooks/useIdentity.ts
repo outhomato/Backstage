@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const IDENTITY_URL = 'https://www.spangascouterna.se/backstage/identity/';
+const IDENTITY_URL = 'https://www.spangascouterna.se/backstage/mobile/identity/';
 
 export interface Identity {
   userId: string;
