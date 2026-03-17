@@ -4,12 +4,16 @@ import { Platform, StyleSheet, Image, ActivityIndicator, View, Text } from 'reac
 import { BlurView } from 'expo-blur';
 import { useState } from 'react';
 import { useMenuConfig, MENU_BASE_URL } from './hooks/useMenuConfig';
+import { useIdentity } from './hooks/useIdentity';
+import { useBadges } from './hooks/useBadges';
 import WebScreen from './screens/WebScreen';
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   const { config, loading, error } = useMenuConfig();
+  const identity = useIdentity();
+  const badges = useBadges(identity?.userId ?? null);
   // resetKeys forces a WebView remount (= reload to original URL) on tab press
   const [resetKeys, setResetKeys] = useState<Record<string, number>>({});
 
@@ -57,10 +61,21 @@ export default function App() {
             : undefined,
         })}
       >
-        {config.tabs.map(tab => (
+        {config.tabs.map(tab => {
+          const badge = badges[tab.label];
+          const showBadge = badge && (badge.count === undefined || badge.count > 0);
+          return (
           <Tab.Screen
             key={tab.label}
             name={tab.label}
+            options={{
+              tabBarBadge: showBadge
+                ? (badge.count !== undefined ? badge.count : '')
+                : undefined,
+              tabBarBadgeStyle: showBadge
+                ? { backgroundColor: badge.color ?? '#FF3B30', color: '#fff', minWidth: badge.count !== undefined ? 18 : 10, height: badge.count !== undefined ? 18 : 10, borderRadius: 9 }
+                : undefined,
+            }}
             listeners={{
               tabPress: () => {
                 setResetKeys(prev => ({ ...prev, [tab.label]: (prev[tab.label] ?? 0) + 1 }));
@@ -74,7 +89,8 @@ export default function App() {
               />
             )}
           </Tab.Screen>
-        ))}
+          );
+        })}
       </Tab.Navigator>
     </NavigationContainer>
   );
