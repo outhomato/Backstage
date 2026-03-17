@@ -10,28 +10,7 @@ if (!$token) {
     exit;
 }
 
-$file = __DIR__ . '/tokens.json';
-$tokens = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
-
-// Uppdatera befintlig token eller lägg till ny
-$found = false;
-foreach ($tokens as &$entry) {
-    if ($entry['token'] === $token) {
-        $entry['updated_at'] = date('c');
-        $found = true;
-        break;
-    }
-}
-
-if (!$found) {
-    $tokens[] = [
-        'token'         => $token,
-        'platform'      => $data['platform'] ?? 'unknown',
-        'registered_at' => date('c'),
-        'updated_at'    => date('c'),
-    ];
-}
-
-file_put_contents($file, json_encode($tokens, JSON_PRETTY_PRINT));
+$stmt = $pdo->prepare('INSERT IGNORE INTO app_tokens (at_token) VALUES (?)');
+$stmt->execute([$token]);
 
 echo json_encode(['success' => true]);
