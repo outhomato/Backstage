@@ -47,11 +47,13 @@ export default function App() {
               />
             );
           },
-          tabBarActiveTintColor: '#000',
-          tabBarInactiveTintColor: '#666',
+          tabBarActiveTintColor: '#fce481',
+          tabBarInactiveTintColor: 'rgba(255,255,255,0.55)',
           tabBarStyle: Platform.OS === 'ios' ? styles.tabBarIOS : styles.tabBarAndroid,
+          tabBarItemStyle: { paddingTop: 30 },
+          tabBarLabelStyle: { marginTop: 15 },
           tabBarBackground: Platform.OS === 'ios'
-            ? () => <BlurView intensity={80} tint="systemUltraThinMaterial" style={StyleSheet.absoluteFill} />
+            ? () => <BlurView intensity={100} tint="systemThickMaterialDark" style={StyleSheet.absoluteFill} />
             : undefined,
         })}
       >
@@ -89,6 +91,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     backgroundColor: 'transparent',
     elevation: 0,
+    height: 90,
   },
   tabBarAndroid: {
     borderTopWidth: 0,
