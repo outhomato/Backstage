@@ -4,6 +4,7 @@ import { Platform, StyleSheet, Image, ActivityIndicator, View, Text } from 'reac
 import { BlurView } from 'expo-blur';
 import { useState } from 'react';
 import { useMenuConfig, MENU_BASE_URL } from './hooks/useMenuConfig';
+import { useIdentity } from './hooks/useIdentity';
 import { useBadges } from './hooks/useBadges';
 import WebScreen from './screens/WebScreen';
 
@@ -11,7 +12,8 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const { config, loading, error } = useMenuConfig();
-  const badges = useBadges();
+  const identity = useIdentity();
+  const badges = useBadges(identity?.userId ?? null);
   // resetKeys forces a WebView remount (= reload to original URL) on tab press
   const [resetKeys, setResetKeys] = useState<Record<string, number>>({});
 

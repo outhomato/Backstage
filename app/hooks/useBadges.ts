@@ -10,14 +10,19 @@ export interface BadgeConfig {
 
 export type BadgeMap = Record<string, BadgeConfig>;
 
-export function useBadges() {
+export function useBadges(userId: string | null) {
   const [badges, setBadges] = useState<BadgeMap>({});
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    if (!userId) {
+      setBadges({});
+      return;
+    }
+
     async function fetchBadges() {
       try {
-        const res = await fetch(BADGES_URL, {
+        const res = await fetch(`${BADGES_URL}?userId=${encodeURIComponent(userId!)}`, {
           credentials: 'include',
           cache: 'no-store',
         });
