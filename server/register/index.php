@@ -10,7 +10,8 @@ if (!$token) {
     exit;
 }
 
-$stmt = $pdo->prepare('INSERT IGNORE INTO app_tokens (at_token) VALUES (?)');
-$stmt->execute([$token]);
+$stmt = $conn->prepare('INSERT IGNORE INTO app_tokens (at_token) VALUES (?)');
+$stmt->bind_param('s', $token);
+$stmt->execute();
 
 echo json_encode(['success' => true]);
